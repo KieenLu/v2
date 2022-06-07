@@ -7,19 +7,15 @@ import mysql.connector
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 
-db = mysql.connector.connect(host='smartdoorbellsystem.cynisqrgpez0.ap-southeast-1.rds.amazonaws.com',
-                             user='kienlu',
-                             password='12345678',
-                             database='Attendance_faces', )
+db = mysql.connector.connect()
 
-scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
-         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+scope = 
 
 creds = ServiceAccountCredentials.from_json_keyfile_name("attendance-faces-e054fb69a2a3.json", scope)
 client = gspread.authorize(creds)
 
 rng = "A2:A"
-spreadsheetId = "1mLw0aypxbVeLJmK1-kPxFULHlQQetzH6WCrnLt6_sJk"
+spreadsheetId = ""
 sheetName = "Attendance Faces"
 spreadsheet = client.open_by_key(spreadsheetId)
 
