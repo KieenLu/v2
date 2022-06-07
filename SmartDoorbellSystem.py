@@ -99,15 +99,15 @@ def main_loop():
 
             metadata = lookup_known_face(face_encoding)
 
-            label_info_faces = ['face_image', 'first_seen', 'last_seen', 'first_seen_this_interaction', 'seen_count']
-
-            data = [metadata["face_image"], metadata["first_seen"], metadata["last_seen"],
-                    metadata['first_seen_this_interaction'], metadata['seen_count']]
-
-            with open('data/info_faces.csv', 'w', encoding='UTF8') as f:
-                writer = csv.writer(f)
-                writer.writerow(label_info_faces)
-                writer.writerow(data)
+            # label_info_faces = ['face_image', 'first_seen', 'last_seen', 'first_seen_this_interaction', 'seen_count']
+            #
+            # data = [metadata["face_image"], metadata["first_seen"], metadata["last_seen"],
+            #         metadata['first_seen_this_interaction'], metadata['seen_count']]
+            #
+            # with open('data/info_faces.csv', 'w', encoding='UTF8') as f:
+            #     writer = csv.writer(f)
+            #     writer.writerow(label_info_faces)
+            #     writer.writerow(data)
             if metadata is not None:
 
                 time_at_door = datetime.now() - metadata['first_seen_this_interaction']
@@ -117,7 +117,7 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 5 < time_notification <5.1:
+                if 30 < time_notification <30.1:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
             else:
@@ -163,11 +163,9 @@ def main_loop():
 
         cv2.imshow('SmartDoorbellSystem', frame)
 
-        keyCode = cv2.waitKey(1)
-        if cv2.getWindowProperty("SmartDoorbellSystem", cv2.WND_PROP_VISIBLE) < 1:
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             save_known_faces()
             break
-
         if len(face_locations) > 0 and number_of_faces_since_save > 100:
             save_known_faces()
             number_of_faces_since_save = 0
