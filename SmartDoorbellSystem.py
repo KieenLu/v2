@@ -89,7 +89,7 @@ def lookup_known_face(face_encoding):
 
 
 def main_loop():
-    video_capture = cv2.VideoCapture(1)
+    video_capture = cv2.VideoCapture(0)
 
     number_of_faces_since_save = 0
 
@@ -140,9 +140,9 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 30 < time_notification < 30.1 and face_names_owner != ['owner']:
+                if 30 < time_notification < 30.1 and face_names_owner == ['owner']:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
-                #     load_data()
+                    load_data()
             else:
                 face_label = "New visitor!"
                 top, right, bottom, left = face_location
