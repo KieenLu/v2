@@ -14,6 +14,16 @@ known_face_encodings = []
 known_face_metadata = []
 
 
+known_face_name_owner = []
+owner_face_encodings = []
+
+facial_encodings_folder = 'data_SmartDoorbell/'
+
+def load_facial_encodings_and_names_from_memory():
+    for filename in os.listdir(facial_encodings_folder):
+        known_face_name_owner.append(filename[:-4])
+        with open(facial_encodings_folder + filename, 'rb') as fp:
+            owner_face_encodings.append(pickle.load(fp)[0])
 
 def save_known_faces():
     with open("data/faces.pickle", "wb") as face_data_file:
@@ -79,7 +89,7 @@ def lookup_known_face(face_encoding):
 
 
 def main_loop():
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(1)
 
     number_of_faces_since_save = 0
 
@@ -95,31 +105,44 @@ def main_loop():
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_labels = []
+        face_names_owner = []
+
         for face_location, face_encoding in zip(face_locations, face_encodings):
+
+            matches_owner = face_recognition.compare_faces(owner_face_encodings, face_encoding)
+            face_distances_owner = face_recognition.face_distance(owner_face_encodings, face_encoding)
+            best_match_index_owner = np.argmin(face_distances_owner)
+
+            if matches_owner[best_match_index_owner]:
+                name_owner = known_face_name_owner[best_match_index_owner]
+                face_names_owner.append(name_owner)
 
             metadata = lookup_known_face(face_encoding)
 
-            # label_info_faces = ['face_image', 'first_seen', 'last_seen', 'first_seen_this_interaction', 'seen_count']
-            #
-            # data = [metadata["face_image"], metadata["first_seen"], metadata["last_seen"],
-            #         metadata['first_seen_this_interaction'], metadata['seen_count']]
-            #
-            # with open('data/info_faces.csv', 'w', encoding='UTF8') as f:
-            #     writer = csv.writer(f)
-            #     writer.writerow(label_info_faces)
-            #     writer.writerow(data)
             if metadata is not None:
 
                 time_at_door = datetime.now() - metadata['first_seen_this_interaction']
+
+                label_info_faces = ['face_image', 'first_seen', 'last_seen', 'first_seen_this_interaction',
+                                    'seen_count']
+
+                data = [metadata["face_image"], metadata["first_seen"], metadata["last_seen"],
+                        metadata['first_seen_this_interaction'], metadata['seen_count']]
+
+                with open('data/info_faces.csv', 'w', encoding='UTF8') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(label_info_faces)
+                    writer.writerow(data)
+
                 face_label = f"At door {int(time_at_door.total_seconds())}s"
                 start = datetime.now()
 
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 30 < time_notification <30.1:
+                if 30 < time_notification < 30.1 and face_names_owner != ['owner']:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
-                    load_data()
+                #     load_data()
             else:
                 face_label = "New visitor!"
                 top, right, bottom, left = face_location
@@ -177,5 +200,6 @@ def main_loop():
 
 
 if __name__ == "__main__":
+    load_facial_encodings_and_names_from_memory()
     load_known_faces()
     main_loop()
