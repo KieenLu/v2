@@ -30,7 +30,7 @@ data = worksheet.get_all_records()
 values = worksheet.get(rng)
 max_intime = '08:00:00'
 
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(1)
 
 path = 'image_Attendance/'
 
@@ -122,8 +122,9 @@ def main_loop():
                 print('recorded')
             else:
                 worksheet.update_cell(namecell.row, datecell.col, 'late')
-            check_in_hour = datetime.now()
-            check_in_day = check_in_hour.strftime("%Y-%m-%d")
+
+            check_in_hour = now.strftime("%H-%M-%S")
+            check_in_day = now.strftime("%Y-%m-%d")
             mycursor = db.cursor()
             mycursor.execute(
                 "INSERT INTO Attendance_faces(id, FullName, Hour_check_in,Day_check_in) VALUES(%s, %s, %s, %s)",
@@ -133,7 +134,7 @@ def main_loop():
             header = ['id', 'FullName', 'Hour_check_in', 'Day_check_in']
             data = [ID_User, name, check_in_hour, check_in_day]
 
-            with open('data/data_Attendance', 'w', encoding='UTF8') as f:
+            with open('data/data_Attendance.csv', 'w', encoding='UTF8') as f:
                 writer = csv.writer(f)
 
                 writer.writerow(header)
