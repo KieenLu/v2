@@ -12,17 +12,6 @@ USING_RPI_CAMERA_MODULE = False
 known_face_encodings = []
 known_face_metadata = []
 
-known_face_name_owner = []
-owner_face_encodings = []
-
-facial_encodings_folder = 'data_SmartDoorbell/'
-
-
-def load_facial_encodings_and_names_from_memory():
-    for filename in os.listdir(facial_encodings_folder):
-        known_face_name_owner.append(filename[:-4])
-        with open(facial_encodings_folder + filename, 'rb') as fp:
-            owner_face_encodings.append(pickle.load(fp)[0])
 
 
 def save_known_faces():
@@ -105,18 +94,7 @@ def main_loop():
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_labels = []
-        face_names_owner = []
-
-        for face_encoding_owner in face_encodings:
-            matches_owner = face_recognition.compare_faces(owner_face_encodings, face_encoding_owner)
-            face_distances_owner = face_recognition.face_distance(owner_face_encodings, face_encoding_owner)
-            best_match_index_owner = np.argmin(face_distances_owner)
-            if matches_owner[best_match_index_owner]:
-                name_owner = known_face_name_owner[best_match_index_owner]
-
-                face_names_owner.append(name_owner)
-            print(face_names_owner)
-
+      
         for face_location, face_encoding in zip(face_locations, face_encodings):
 
             metadata = lookup_known_face(face_encoding)
@@ -142,10 +120,9 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 5 < time_notification < 5.1 and face_names_owner != ['owner']:
+                if 10 < time_notification < 10.1:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
-
 
             else:
                 face_label = "New visitor!"
@@ -204,6 +181,5 @@ def main_loop():
 
 
 if __name__ == "__main__":
-    load_facial_encodings_and_names_from_memory()
     load_known_faces()
     main_loop()
