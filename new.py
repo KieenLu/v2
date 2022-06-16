@@ -107,7 +107,7 @@ def lookup_known_face(face_encoding):
 
 def main_loop():
 
-    video_capture = cv2.VideoCapture(1)
+    video_capture = cv2.VideoCapture(0)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
     number_of_faces_since_save = 0
