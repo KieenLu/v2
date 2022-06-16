@@ -1,7 +1,7 @@
 import cv2
 import face_recognition
 import pickle
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 
