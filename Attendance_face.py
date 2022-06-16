@@ -6,6 +6,7 @@ from datetime import datetime
 import mysql.connector
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
+import csv
 
 db = mysql.connector.connect(host='smartdoorbellsystem.cynisqrgpez0.ap-southeast-1.rds.amazonaws.com',
                              user='kienlu',
@@ -121,12 +122,23 @@ def main_loop():
                 print('recorded')
             else:
                 worksheet.update_cell(namecell.row, datecell.col, 'late')
-            check_in = datetime.now()
+            check_in_hour = datetime.now()
+            check_in_day = check_in_hour.strftime("%Y-%m-%d")
             mycursor = db.cursor()
             mycursor.execute(
-                "INSERT INTO Attendance_faces(id, FullName, Check_in) VALUES(%s, %s, %s)",
-                (ID_User, name, check_in))
+                "INSERT INTO Attendance_faces(id, FullName, Hour_check_in,Day_check_in) VALUES(%s, %s, %s, %s)",
+                (ID_User, name, check_in_hour, check_in_day))
             db.commit()
+
+            header = ['id', 'FullName', 'Hour_check_in', 'Day_check_in']
+            data = [ID_User, name, check_in_hour, check_in_day]
+
+            with open('data/data_Attendance', 'w', encoding='UTF8') as f:
+                writer = csv.writer(f)
+
+                writer.writerow(header)
+
+                writer.writerow(data)
         else:
             count_save += 1
 
