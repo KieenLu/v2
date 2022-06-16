@@ -154,7 +154,7 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 5 < time_notification < 5.1:
+                if 10 < time_notification < 10.1:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
             # If this is a brand new face, add it to our list of known faces
