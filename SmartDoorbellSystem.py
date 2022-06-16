@@ -7,7 +7,6 @@ import csv
 from monitor_upload import load_data
 import os
 
-
 USING_RPI_CAMERA_MODULE = False
 
 known_face_encodings = []
@@ -18,12 +17,12 @@ owner_face_encodings = []
 
 facial_encodings_folder = 'data_SmartDoorbell/'
 
+
 def load_facial_encodings_and_names_from_memory():
     for filename in os.listdir(facial_encodings_folder):
         known_face_name_owner.append(filename[:-4])
         with open(facial_encodings_folder + filename, 'rb') as fp:
             owner_face_encodings.append(pickle.load(fp)[0])
-
 
 
 def save_known_faces():
@@ -65,6 +64,7 @@ def register_new_face(face_encoding, face_image):
         writer.writerow(label_info_faces)
         writer.writerow(data)
 
+
 def lookup_known_face(face_encoding):
     metadata = None
 
@@ -82,11 +82,10 @@ def lookup_known_face(face_encoding):
         metadata["last_seen"] = datetime.now()
         metadata["seen_frames"] += 1
 
-        if datetime.now() - metadata["first_seen_this_interaction"] > timedelta(minutes=1):
+        if datetime.now() - metadata["first_seen_this_interaction"] > timedelta(seconds=20):
             metadata["first_seen_this_interaction"] = datetime.now()
             metadata["seen_count"] += 1
     return metadata
-
 
 
 def main_loop():
@@ -98,7 +97,7 @@ def main_loop():
 
         ret, frame = video_capture.read()
 
-        small_frame = cv2.resize(frame, (0 , 0), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
         rgb_small_frame = small_frame[:, :, ::-1]
 
@@ -147,6 +146,7 @@ def main_loop():
                 if 5 < time_notification < 5.1 and face_names_owner != ['owner']:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
+             
             else:
                 face_label = "New visitor!"
                 top, right, bottom, left = face_location
@@ -172,7 +172,7 @@ def main_loop():
 
         for metadata in known_face_metadata:
 
-            if datetime.now() - metadata["last_seen"] < timedelta(seconds=10) and metadata["seen_frames"] > 1:
+            if datetime.now() - metadata["last_seen"] < timedelta(seconds=10) and metadata["seen_frames"] > 5:
 
                 x_position = number_of_recent_visitors * 150
                 frame[30:180, x_position:x_position + 150] = metadata["face_image"]
@@ -201,6 +201,7 @@ def main_loop():
 
     video_capture.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     load_facial_encodings_and_names_from_memory()
