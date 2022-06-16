@@ -143,8 +143,9 @@ def main_loop():
         else:
             count_save += 1
 
-        keyCode = cv2.waitKey(1)
-        if cv2.getWindowProperty("Attendance_faces", cv2.WND_PROP_VISIBLE) < 1:
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+
             break
     video_capture.release()
     cv2.destroyAllWindows()
