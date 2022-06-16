@@ -7,15 +7,19 @@ import mysql.connector
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 
-db = mysql.connector.connect()
+db = mysql.connector.connect(host='smartdoorbellsystem.cynisqrgpez0.ap-southeast-1.rds.amazonaws.com',
+                             user='kienlu',
+                             password='12345678',
+                             database='Attendance_faces', )
 
-scope = 
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 
 creds = ServiceAccountCredentials.from_json_keyfile_name("attendance-faces-e054fb69a2a3.json", scope)
 client = gspread.authorize(creds)
 
 rng = "A2:A"
-spreadsheetId = ""
+spreadsheetId = "1mLw0aypxbVeLJmK1-kPxFULHlQQetzH6WCrnLt6_sJk"
 sheetName = "Attendance Faces"
 spreadsheet = client.open_by_key(spreadsheetId)
 
@@ -81,6 +85,7 @@ def main_loop():
                     ID_User_.append(ID_User)
                     face_names.append(name)
 
+        process_this_frame = not process_this_frame
 
         for (top, right, bottom, left), name in zip(face_locations, face_names):
             top *= 4
