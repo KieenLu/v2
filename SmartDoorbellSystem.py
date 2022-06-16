@@ -23,7 +23,7 @@ def load_facial_encodings_and_names_from_memory():
         known_face_name_owner.append(filename[:-4])
         with open(facial_encodings_folder + filename, 'rb') as fp:
             owner_face_encodings.append(pickle.load(fp)[0])
-            print("da load chu nha")
+
 
 
 def save_known_faces():
@@ -118,7 +118,6 @@ def main_loop():
                 name_owner = known_face_name_owner[best_match_index_owner]
 
                 face_names_owner.append(name_owner)
-            print(face_names_owner)
 
         for face_location, face_encoding in zip(face_locations, face_encodings):
 
