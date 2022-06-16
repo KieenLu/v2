@@ -30,7 +30,7 @@ data = worksheet.get_all_records()
 values = worksheet.get(rng)
 max_intime = '08:00:00'
 
-video_capture = cv2.VideoCapture(1)
+video_capture = cv2.VideoCapture(0)
 
 path = 'image_Attendance/'
 
