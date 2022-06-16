@@ -108,15 +108,14 @@ def main_loop():
         face_names_owner = []
 
         for face_encoding_owner in face_encodings:
-
             matches_owner = face_recognition.compare_faces(owner_face_encodings, face_encoding_owner)
             face_distances_owner = face_recognition.face_distance(owner_face_encodings, face_encoding_owner)
             best_match_index_owner = np.argmin(face_distances_owner)
-
             if matches_owner[best_match_index_owner]:
                 name_owner = known_face_name_owner[best_match_index_owner]
 
                 face_names_owner.append(name_owner)
+            print(face_names_owner)
 
         for face_location, face_encoding in zip(face_locations, face_encodings):
 
@@ -143,10 +142,11 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 10 < time_notification < 10.1 and face_names_owner != ['owner']:
+                if 5 < time_notification < 5.1 and face_names_owner != ['owner']:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
-             
+
+
             else:
                 face_label = "New visitor!"
                 top, right, bottom, left = face_location
