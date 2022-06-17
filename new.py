@@ -4,18 +4,24 @@ from datetime import datetime, timedelta
 import numpy as np
 import pickle
 import csv
-from monitor_upload import load_data
 import os
-
+from monitor_upload import load_data
 # Set this depending on your camera type:
 # - True = Raspberry Pi 2.x camera module
 # - False = USB webcam or other USB video input (like an HDMI capture device)
 USING_RPI_CAMERA_MODULE = False
-
+facial_encodings_folder = 'data_SmartDoorbell/'
 # Our list of known face encodings and a matching list of metadata about each face.
 known_face_encodings = []
 known_face_metadata = []
+known_face_names_owner = []
+known_face_encodings_owner = []
 
+def load_facial_encodings_and_names_from_memory():
+    for filename in os.listdir(facial_encodings_folder):
+        known_face_names_owner.append(filename[:-4])
+        with open(facial_encodings_folder + filename, 'rb') as fp:
+            known_face_encodings_owner.append(pickle.load(fp)[0])
 
 def save_known_faces():
     with open("data/known_faces.dat", "wb") as face_data_file:
@@ -107,7 +113,7 @@ def lookup_known_face(face_encoding):
 
 def main_loop():
 
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(1)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
     number_of_faces_since_save = 0
@@ -125,14 +131,17 @@ def main_loop():
         # Find all the face locations and face encodings in the current frame of video
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+        for face_encoding_owner in face_encodings:
+            results = face_recognition.compare_faces(known_face_encodings_owner, face_encoding_owner)
+            print(results)
+            break
 
         # Loop through each detected face and see if it is one we have seen before
         # If so, we'll give it a label that we'll draw on top of the video.
         face_labels = []
         for face_location, face_encoding in zip(face_locations, face_encodings):
-            # See if this face is in our list of known faces.
-            metadata = lookup_known_face(face_encoding)
 
+            metadata = lookup_known_face(face_encoding)
             # If we found the face, label the face with some useful information.
             if metadata is not None:
                 time_at_door = datetime.now() - metadata['first_seen_this_interaction']
@@ -154,7 +163,7 @@ def main_loop():
                 time_notification = (time_at_door.total_seconds())
                 label = start.strftime("%Y-%m-%d_%H-%M-%S")
 
-                if 10 < time_notification < 10.1:
+                if 5 < time_notification < 5.1 and results == [False]:
                     cv2.imwrite('image/' + str(label) + "_image.jpg", frame)
                     load_data()
             # If this is a brand new face, add it to our list of known faces
@@ -226,5 +235,6 @@ def main_loop():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+    load_facial_encodings_and_names_from_memory()
     load_known_faces()
     main_loop()
