@@ -14,7 +14,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name("attendance-faces-e054f
 client = gspread.authorize(creds)
 
 rng = "A2:A"
-spreadsheetId = "1mLw0aypxbVeLJmK1-kPxFULHlQQetzH6WCrnLt6_sJk"
+
 sheetName = "Attendance Faces"
 spreadsheet = client.open_by_key(spreadsheetId)
 
